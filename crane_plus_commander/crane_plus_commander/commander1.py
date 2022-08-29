@@ -128,7 +128,7 @@ def main():
     goals['ones'] = [1, 1, 1, 1]
     goals['home'] = [0.0, -1.16, -2.01, -0.73]
     goals['carry'] = [-0.00, -1.37, -2.52, 1.17]
-
+    goals['1/2'] = [0.5, 0.5, 0.5, 0.5]
     # Ctrl+cでエラーにならないようにKeyboardInterruptを捕まえる
     try:
         while True:

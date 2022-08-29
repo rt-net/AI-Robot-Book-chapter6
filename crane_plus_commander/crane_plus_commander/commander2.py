@@ -105,9 +105,15 @@ def main():
                 elif c == '2':
                     joint[0] += 0.1
                 elif c == '3':
-                    joint[1] -= 0.1
+                    if joint[1] < -1.40:
+                        print("地面にめり込む")
+                    else:
+                        joint[1] -= 0.1
                 elif c == '4':
-                    joint[1] += 0.1
+                    if joint[1] > 1.40:
+                        print("地面にめり込む")
+                    else:
+                        joint[1] += 0.1
                 elif c == '5':
                     joint[2] -= 0.1
                 elif c == '6':
@@ -132,6 +138,10 @@ def main():
                     z += 0.01
                 elif c == 'c':
                     z -= 0.01
+                elif c == 'l':
+                    x += 0.05
+                elif c == 'p':
+                    z -= 0.05
                 elif c == 'f':
                     pitch += 0.1
                 elif c == 'v':
@@ -152,11 +162,11 @@ def main():
                     break
 
                 # 逆運動学
-                if c in 'azsxdcfve':
+                if c in 'azsxdcfvlpe':
                     joint = inverse_kinematics([x, y, z, pitch], elbow_up)
-                    if joint is None:
-                        print('逆運動学の解なし')
-                        joint = joint_prev.copy()
+                if joint is None:
+                    print('逆運動学の解なし')
+                    joint = joint_prev.copy()
                 elif c in 'gb':
                     gripper = from_gripper_ratio(ratio)
 
@@ -168,6 +178,8 @@ def main():
                 if not gripper_in_range(gripper):
                     print('グリッパ指令値が範囲外')
                     gripper = gripper_prev
+
+                 
 
                 # 変化があればパブリッシュ
                 publish = False

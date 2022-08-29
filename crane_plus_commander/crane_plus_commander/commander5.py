@@ -66,7 +66,7 @@ class Commander(Node):
         st.child_frame_id = 'crane_plus_endtip'
         st.transform.translation.x = 0.0
         st.transform.translation.y = 0.0
-        st.transform.translation.z = 0.090
+        st.transform.translation.z = 0.060
         qu = quaternion_from_euler(0.0, -pi/2, 0.0)
         st.transform.rotation.x = qu[0]
         st.transform.rotation.y = qu[1]

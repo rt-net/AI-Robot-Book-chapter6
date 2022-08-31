@@ -8,8 +8,18 @@ from threading import Event
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 from airobot_interfaces.srv import StringCommand
-from crane_plus_commander.kinematics import (
-    from_gripper_ratio, gripper_in_range)
+import time
+import threading
+from math import pi
+from crane_plus_commander.kbhit import KBHit
+from crane_plus_commander.kinematics import (forward_kinematics, from_gripper_ratio, gripper_in_range,
+    inverse_kinematics, joint_in_range, to_gripper_ratio)
+from tf2_ros import LookupException
+from tf2_ros.buffer import Buffer
+from tf2_ros.transform_listener import TransformListener
+from tf_transformations import euler_from_quaternion, quaternion_from_euler
+from geometry_msgs.msg import TransformStamped
+from tf2_ros.static_transform_broadcaster import StaticTransformBroadcaster
 
 
 # CRANE+ V2用のアクションへリクエストを送り，他からサービスを受け付けるノード
@@ -40,9 +50,15 @@ class Commander(Node):
         self.poses['ones'] = [1, 1, 1, 1]
         self.poses['home'] = [0.0, -1.16, -2.01, -0.73]
         self.poses['carry'] = [-0.00, -1.37, -2.52, 1.17]
+        self.poses['open'] = [0, 0, 0, -0.69]
+        self._tf_publisher = StaticTransformBroadcaster(self)
+        self.send_static_transform()
+        self._tf_buffer = Buffer()
+        self._tf_listener = TransformListener(self._tf_buffer, self)
         self.service = self.create_service(
             StringCommand, 'manipulation/command', self.command_callback,
             callback_group=self.callback_group)
+        #self.endtip = {}
 
     def command_callback(self, request, response):
         self.get_logger().info(f'command: {request.command}')
@@ -51,6 +67,8 @@ class Commander(Node):
             self.set_pose(words, response)
         elif words[0] == 'set_gripper':
             self.set_gripper(words, response)
+        elif words[0] == 'set_endtip':
+            self.set_endtip(words, response)
         else:
             response.answer = f'NG {words[0]} not supported'
         self.get_logger().info(f'answer: {response.answer}')
@@ -67,6 +85,18 @@ class Commander(Node):
         if self.check_action_result(r, response):
             return
         response.answer = 'OK'
+        
+        
+    def set_endtip(self, words, response):
+        if len(words) < 2:
+            response.answer = f'NG {words[0]} argument required'
+            return
+        print('a')
+        print(self.get_endtip_position())
+          #逆運動学入れる
+          
+        response.answer = 'OK'
+
 
     def set_gripper(self, words, response):
         if len(words) < 2:
@@ -129,6 +159,7 @@ class Commander(Node):
         send_goal_future.add_done_callback(self.goal_response_callback)
         self.action_result = None
         self.action_done_event.wait(time*2)
+        
         return self.action_result
 
     def goal_response_callback(self, future):
@@ -141,8 +172,47 @@ class Commander(Node):
     def get_result_callback(self, future):
         self.action_result = future.result()
         self.action_done_event.set()
-
-
+        
+    def send_static_transform(self):
+        st = TransformStamped()
+        st.header.stamp = self.get_clock().now().to_msg()
+        st.header.frame_id = 'crane_plus_link4'
+        st.child_frame_id = 'crane_plus_endtip'
+        st.transform.translation.x = 0.0
+        st.transform.translation.y = 0.0
+        st.transform.translation.z = 0.090
+        qu = quaternion_from_euler(0.0, -pi/2, 0.0)
+        st.transform.rotation.x = qu[0]
+        st.transform.rotation.y = qu[1]
+        st.transform.rotation.z = qu[2]
+        st.transform.rotation.w = qu[3]
+        self._tf_publisher.sendTransform(st)
+    
+    def get_endtip_position(self):
+        try:
+            print('b')
+            when = rclpy.time.Time()
+            trans = self._tf_buffer.lookup_transform(
+                'crane_plus_base',
+                'crane_plus_endtip',
+                when,
+                timeout=Duration(seconds=1.0))
+        except LookupException as e:
+            self.get_logger().info(e)
+            return None
+        tx = trans.transform.translation.x
+        ty = trans.transform.translation.y
+        tz = trans.transform.translation.z
+        rx = trans.transform.rotation.x
+        ry = trans.transform.rotation.y
+        rz = trans.transform.rotation.z
+        rw = trans.transform.rotation.w
+        roll, pitch, yaw = euler_from_quaternion([rx, ry, rz, rw])
+        return tx, ty, tz, roll, pitch, yaw
+     
+    
+    
+    
 def main():
     print('開始')
 
@@ -161,6 +231,17 @@ def main():
     try:
         executor = MultiThreadedExecutor()
         rclpy.spin(commander, executor)
+        
+        publish = False
+        if publish:
+            time.sleep(dt)
+            position = commander.get_endtip_position()
+            if position is not None:
+                x, y, z, roll, pitch, yaw = position
+                print((f'x: {x:.3f}, y: {y:.3f}, z: {z:.3f}, '
+                       f'roll: {roll:.3f}, pitch: {pitch:.3f}, '
+                       f'yaw: {yaw:.3f}'))
+        
     except KeyboardInterrupt:
         pass
 

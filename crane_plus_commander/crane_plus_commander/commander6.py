@@ -105,7 +105,7 @@ class Commander(Node):
         print(str(self.joint))
         if self.joint is None:
                         print('逆運動学の解なし')
-                        response.answer = 'NG'
+                        response.answer = '逆運動学の解なし'
                         return
         r = self.send_goal_joint(self.joint, 3.0)
         if self.check_action_result(r, response):

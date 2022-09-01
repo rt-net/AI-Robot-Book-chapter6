@@ -44,6 +44,7 @@ class Commander(Node):
             'crane_plus_gripper_controller/follow_joint_trajectory',
             callback_group=self.callback_group)
         self.action_done_event = Event()
+        self.elbow_up = True
         # 文字列とポーズの組を保持する辞書
         self.poses = {}
         self.poses['zeros'] = [0, 0, 0, 0]
@@ -58,6 +59,7 @@ class Commander(Node):
         self.service = self.create_service(
             StringCommand, 'manipulation/command', self.command_callback,
             callback_group=self.callback_group)
+        self.joint = [0,0,0,0]
         #self.endtip = {}
 
     def command_callback(self, request, response):
@@ -92,9 +94,21 @@ class Commander(Node):
             response.answer = f'NG {words[0]} argument required'
             return
         print('a')
-        print(self.get_endtip_position())
+        position = self.get_endtip_position()
+        if position is not None:
+            x, y, z, roll, pitch, yaw = position
+            print((f'x: {x:.3f}, y: {y:.3f}, z: {z:.3f}, '
+                   f'roll: {roll:.3f}, pitch: {pitch:.3f}, '
+                   f'yaw: {yaw:.3f}'))
           #逆運動学入れる
-          
+        self.joint = inverse_kinematics([x, y, z, pitch], self.elbow_up)
+        print(str(self.joint))
+        if self.joint is None:
+                        print('逆運動学の解なし')
+                        self.joint = joint_prev.copy()
+        self.action_result
+        if self.check_action_result(self.joint, response):
+            return
         response.answer = 'OK'
 
 
@@ -190,11 +204,10 @@ class Commander(Node):
     
     def get_endtip_position(self):
         try:
-            print('b')
             when = rclpy.time.Time()
             trans = self._tf_buffer.lookup_transform(
                 'crane_plus_base',
-                'crane_plus_endtip',
+                'target',
                 when,
                 timeout=Duration(seconds=1.0))
         except LookupException as e:
@@ -232,15 +245,6 @@ def main():
         executor = MultiThreadedExecutor()
         rclpy.spin(commander, executor)
         
-        publish = False
-        if publish:
-            time.sleep(dt)
-            position = commander.get_endtip_position()
-            if position is not None:
-                x, y, z, roll, pitch, yaw = position
-                print((f'x: {x:.3f}, y: {y:.3f}, z: {z:.3f}, '
-                       f'roll: {roll:.3f}, pitch: {pitch:.3f}, '
-                       f'yaw: {yaw:.3f}'))
         
     except KeyboardInterrupt:
         pass

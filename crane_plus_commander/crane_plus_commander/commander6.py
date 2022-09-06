@@ -46,6 +46,8 @@ class Commander(Node):
         self.action_done_event = Event()
         self.elbow_up = True
         # 文字列とポーズの組を保持する辞書
+        self.pickup = {}
+        self.pickup['cup'] = [0.062, 0.000, 0.161, 0.052]
         self.poses = {}
         self.poses['zeros'] = [0, 0, 0, 0]
         self.poses['ones'] = [1, 1, 1, 1]
@@ -59,7 +61,9 @@ class Commander(Node):
         self.service = self.create_service(
             StringCommand, 'manipulation/command', self.command_callback,
             callback_group=self.callback_group)
-        self.joint = [0,0,0,0]
+        
+        
+        
         #self.endtip = {}
 
     def command_callback(self, request, response):
@@ -71,11 +75,81 @@ class Commander(Node):
             self.set_gripper(words, response)
         elif words[0] == 'set_endtip':
             self.set_endtip(words, response)
+        elif words[0] == 'pickup':
+            self.set_pickup(words, response)
         else:
             response.answer = f'NG {words[0]} not supported'
         self.get_logger().info(f'answer: {response.answer}')
         return response
-
+        
+        
+    def set_pickup(self, words, response):
+        if len(words) < 2:
+            response.answer = f'NG {words[0]} argument required'
+            return
+        print('a')
+        
+          #逆運動学入れる
+        self.joint = inverse_kinematics(self.pickup[words[1]], self.elbow_up)
+        print(str(self.joint))
+        if self.joint is None:
+                        print('逆運動学の解なし')
+                        response.answer = '逆運動学の解なし'
+                        return
+        r = self.send_goal_joint(self.joint, 3.0)
+        if self.check_action_result(r, response):
+            return
+        time.sleep(3)
+        response.answer = '3sec stop'     
+        #next gripper => open 
+        gripper = -0.70
+        dt = 1.0
+        r = self.send_goal_gripper(gripper, dt)
+        if self.check_action_result(r, response):
+            return
+        time.sleep(3)
+        response.answer = '3sec stop'  
+        
+        #next arm => move 
+        self.pickup['cup'][0]=self.pickup['cup'][0] + 0.1
+        self.pickup['cup'][0]=self.pickup['cup'][2] - 0.006
+        self.joint = inverse_kinematics(self.pickup[words[1]], self.elbow_up)
+        print(str(self.joint))
+        if self.joint is None:
+            print('逆運動学の解なし')
+            response.answer = '逆運動学の解なし'
+            return
+        r = self.send_goal_joint(self.joint, 3.0)
+        if self.check_action_result(r, response):
+            return 
+        time.sleep(3)
+        response.answer ='3sec stop'
+        
+        
+        #next gripper => close
+        gripper = 0
+        dt = 1.0
+        r = self.send_goal_gripper(gripper, dt)
+        if self.check_action_result(r, response):
+            return
+        
+        #next arm => move 
+        self.pickup['cup'][0]=self.pickup['cup'][2] + 	0.015
+        self.joint = inverse_kinematics(self.pickup[words[1]], self.elbow_up)
+        print(str(self.joint))
+        if self.joint is None:
+            print('逆運動学の解なし')
+            response.answer = '逆運動学の解なし'
+            return
+        r = self.send_goal_joint(self.joint, 3.0)
+        if self.check_action_result(r, response):
+            return
+        time.sleep(3)
+        response.answer='3sec stop'
+        response.answer = 'OK'
+        
+        
+        
     def set_pose(self, words, response):
         if len(words) < 2:
             response.answer = f'NG {words[0]} argument required'
@@ -208,7 +282,7 @@ class Commander(Node):
             when = rclpy.time.Time()
             trans = self._tf_buffer.lookup_transform(
                 'crane_plus_base',
-                'target',
+                'crane_plus_endtip',
                 when,
                 timeout=Duration(seconds=1.0))
         except LookupException as e:

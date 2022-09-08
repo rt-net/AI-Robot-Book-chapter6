@@ -46,8 +46,6 @@ class Commander(Node):
         self.action_done_event = Event()
         self.elbow_up = True
         # 文字列とポーズの組を保持する辞書
-        self.pickup = {}
-        self.pickup['cup'] = [0.062, 0.000, 0.161, 0.052]
         self.poses = {}
         self.poses['zeros'] = [0, 0, 0, 0]
         self.poses['ones'] = [1, 1, 1, 1]
@@ -88,9 +86,18 @@ class Commander(Node):
             response.answer = f'NG {words[0]} argument required'
             return
         print('a')
-        
+        position = self.get_endtip_position(words[1])
+        if position is not None:
+            x, y, z, roll, pitch, yaw = position
+            print((f'x: {x:.3f}, y: {y:.3f}, z: {z:.3f}, '
+                   f'roll: {roll:.3f}, pitch: {pitch:.3f}, '
+                   f'yaw: {yaw:.3f}'))
           #逆運動学入れる
-        self.joint = inverse_kinematics(self.pickup[words[1]], self.elbow_up)
+        words[0]={}
+        words[0][str(words[1])] = [x,y,z,pitch]
+        words[0][str(words[1])][0]= words[0][str(words[1])][0] - 0.12
+        print(str(words[0][str(words[1])]))
+        self.joint = inverse_kinematics(words[0][str(words[1])], self.elbow_up)
         print(str(self.joint))
         if self.joint is None:
                         print('逆運動学の解なし')
@@ -98,8 +105,7 @@ class Commander(Node):
                         return
         r = self.send_goal_joint(self.joint, 3.0)
         if self.check_action_result(r, response):
-            return
-        time.sleep(3)
+            return        
         response.answer = '3sec stop'     
         #next gripper => open 
         gripper = -0.70
@@ -111,9 +117,9 @@ class Commander(Node):
         response.answer = '3sec stop'  
         
         #next arm => move 
-        self.pickup['cup'][0]=self.pickup['cup'][0] + 0.1
-        self.pickup['cup'][0]=self.pickup['cup'][2] - 0.006
-        self.joint = inverse_kinematics(self.pickup[words[1]], self.elbow_up)
+        words[0][str(words[1])][0]=words[0][str(words[1])][0] + 0.1
+        
+        self.joint = inverse_kinematics(words[0][str(words[1])], self.elbow_up)
         print(str(self.joint))
         if self.joint is None:
             print('逆運動学の解なし')
@@ -134,8 +140,9 @@ class Commander(Node):
             return
         
         #next arm => move 
-        self.pickup['cup'][0]=self.pickup['cup'][2] + 	0.015
-        self.joint = inverse_kinematics(self.pickup[words[1]], self.elbow_up)
+        words[0][str(words[1])][2]=words[0][str(words[1])][2] + 	0.04
+        
+        self.joint = inverse_kinematics(words[0][str(words[1])], self.elbow_up)
         print(str(self.joint))
         if self.joint is None:
             print('逆運動学の解なし')
@@ -146,6 +153,20 @@ class Commander(Node):
             return
         time.sleep(3)
         response.answer='3sec stop'
+        
+        
+        words[0][str(words[1])][0]=words[0][str(words[1])][0] - 0.1
+        
+        self.joint = inverse_kinematics(words[0][str(words[1])], self.elbow_up)
+        print(str(self.joint))
+        if self.joint is None:
+            print('逆運動学の解なし')
+            response.answer = '逆運動学の解なし'
+            return
+        r = self.send_goal_joint(self.joint, 3.0)
+        if self.check_action_result(r, response):
+            return 
+        time.sleep(3)
         response.answer = 'OK'
         
         
@@ -277,12 +298,12 @@ class Commander(Node):
         st.transform.rotation.w = qu[3]
         self._tf_publisher.sendTransform(st)
     
-    def get_endtip_position(self):
+    def get_endtip_position(self,name):
         try:
             when = rclpy.time.Time()
             trans = self._tf_buffer.lookup_transform(
                 'crane_plus_base',
-                'crane_plus_endtip',
+                name,
                 when,
                 timeout=Duration(seconds=1.0))
         except LookupException as e:

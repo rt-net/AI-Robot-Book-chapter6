@@ -120,6 +120,8 @@ def main():
 
     print('1, 2, 3, 4, 5, 6, 7, 8, 9, 0キーを押して関節を動かす')
     print('スペースキーを押して起立状態にする')
+    print('pを押すとポーズ設定')
+    print('rを押すとポーズを登録')
     print('Escキーを押して終了')
 
      # 文字列とポーズの組を保持する辞書
@@ -129,6 +131,8 @@ def main():
     goals['home'] = [0.0, -1.16, -2.01, -0.73]
     goals['carry'] = [-0.00, -1.37, -2.52, 1.17]
     goals['1/2'] = [0.5, 0.5, 0.5, 0.5]
+    goals['move_ob'] = [0.0, -0.90, 0.10, 0.50]
+    #joint: [0.00, -0.60, 0.10, 0.40]
     # Ctrl+cでエラーにならないようにKeyboardInterruptを捕まえる
     try:
         while True:
@@ -137,7 +141,7 @@ def main():
             gripper_prev = gripper
 
             # 目標関節値とともに送る目標時間
-            dt = 3.0
+            dt = 0.5
 
             # キーが押されているか？
             if kb.kbhit():
@@ -190,6 +194,7 @@ def main():
                             print(f'[{j[0]:.2f}, {j[1]:.2f}, {j[2]:.2f}, {j[3]:.2f}] {g:.2f}')
                             print('')
                     except KeyboardInterrupt:
+                        print(" ")
                         pass
                     
                 elif c == 'r':

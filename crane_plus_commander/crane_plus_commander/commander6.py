@@ -85,17 +85,27 @@ class Commander(Node):
         if len(words) < 2:
             response.answer = f'NG {words[0]} argument required'
             return
-        print('a')
         position = self.get_endtip_position(words[1])
         if position is not None:
             x, y, z, roll, pitch, yaw = position
             print((f'x: {x:.3f}, y: {y:.3f}, z: {z:.3f}, '
                    f'roll: {roll:.3f}, pitch: {pitch:.3f}, '
                    f'yaw: {yaw:.3f}'))
+                   
+        #next gripper => open 
+        gripper = -0.70
+        dt = 1.0
+        r = self.send_goal_gripper(gripper, dt)
+        if self.check_action_result(r, response):
+            return
+        time.sleep(2)
+        response.answer = '3sec stop' 
+        
+        #next arm => move
+        
           #逆運動学入れる
         words[0]={}
         words[0][str(words[1])] = [x,y,z,pitch]
-        words[0][str(words[1])][0]= words[0][str(words[1])][0] - 0.12
         print(str(words[0][str(words[1])]))
         self.joint = inverse_kinematics(words[0][str(words[1])], self.elbow_up)
         print(str(self.joint))
@@ -103,36 +113,14 @@ class Commander(Node):
                         print('逆運動学の解なし')
                         response.answer = '逆運動学の解なし'
                         return
-        r = self.send_goal_joint(self.joint, 3.0)
+        r = self.send_goal_joint(self.joint, 3)
         if self.check_action_result(r, response):
             return        
         response.answer = '3sec stop'     
-        #next gripper => open 
-        gripper = -0.70
-        dt = 1.0
-        r = self.send_goal_gripper(gripper, dt)
-        if self.check_action_result(r, response):
-            return
-        time.sleep(3)
-        response.answer = '3sec stop'  
-        
-        #next arm => move 
-        words[0][str(words[1])][0]=words[0][str(words[1])][0] + 0.1
-        
-        self.joint = inverse_kinematics(words[0][str(words[1])], self.elbow_up)
-        print(str(self.joint))
-        if self.joint is None:
-            print('逆運動学の解なし')
-            response.answer = '逆運動学の解なし'
-            return
-        r = self.send_goal_joint(self.joint, 3.0)
-        if self.check_action_result(r, response):
-            return 
-        time.sleep(3)
-        response.answer ='3sec stop'
-        
-        
+         
+         
         #next gripper => close
+        
         gripper = 0
         dt = 1.0
         r = self.send_goal_gripper(gripper, dt)
@@ -140,7 +128,7 @@ class Commander(Node):
             return
         
         #next arm => move 
-        words[0][str(words[1])][2]=words[0][str(words[1])][2] + 	0.04
+        words[0][str(words[1])][2]=words[0][str(words[1])][2] + 	0.08
         
         self.joint = inverse_kinematics(words[0][str(words[1])], self.elbow_up)
         print(str(self.joint))
@@ -151,10 +139,10 @@ class Commander(Node):
         r = self.send_goal_joint(self.joint, 3.0)
         if self.check_action_result(r, response):
             return
-        time.sleep(3)
+        time.sleep(2)
         response.answer='3sec stop'
         
-        
+        #next arm => move
         words[0][str(words[1])][0]=words[0][str(words[1])][0] - 0.1
         
         self.joint = inverse_kinematics(words[0][str(words[1])], self.elbow_up)
@@ -166,7 +154,7 @@ class Commander(Node):
         r = self.send_goal_joint(self.joint, 3.0)
         if self.check_action_result(r, response):
             return 
-        time.sleep(3)
+        time.sleep(2)
         response.answer = 'OK'
         
         
@@ -188,13 +176,13 @@ class Commander(Node):
         if len(words) < 2:
             response.answer = f'NG {words[0]} argument required'
             return
-        print('a')
-        position = self.get_endtip_position()
+        position = self.get_endtip_position(words[1])
         if position is not None:
             x, y, z, roll, pitch, yaw = position
             print((f'x: {x:.3f}, y: {y:.3f}, z: {z:.3f}, '
                    f'roll: {roll:.3f}, pitch: {pitch:.3f}, '
                    f'yaw: {yaw:.3f}'))
+        #next arm => move       	
           #逆運動学入れる
         self.joint = inverse_kinematics([x, y, z, pitch], self.elbow_up)
         print(str(self.joint))

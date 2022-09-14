@@ -105,34 +105,17 @@ def main():
                 elif c == '2':
                     joint[0] += 0.1
                 elif c == '3':
-                    if joint[1] < -1.40:
-                        print("地面にめり込む")
-                    else:
-                        joint[1] -= 0.1
+                    joint[1] -= 0.1
                 elif c == '4':
-                    if joint[1] > 1.40:
-                        print("地面にめり込む")
-                    else:
-                        joint[1] += 0.1
+                    joint[1] += 0.1
                 elif c == '5':
-                    if joint[2] == -0.10 and joint[1] == 1.40:
-                        print("地面にめり込む")
-                    else:
-                        joint[2] -= 0.1
+                    joint[2] -= 0.1
                 elif c == '6':
-                    if joint[2] == 0.10 and joint[1] == -1.40:
-                        print("地面にめり込む")
-                    else:
-                        joint[2] += 0.1
+                    joint[2] += 0.1
                 elif c == '7':
                     joint[3] -= 0.1
                 elif c == '8':
-                    if joint[3] == 0.30 and joint[1] == -1.40:
-                        print("地面にめり込む")
-                    elif joint[2] >= -0.70 and joint[3] >= 1.50 and joint[1] == -1.40:
-                        print("地面にめり込む")
-                    else:
-                        joint[3] += 0.1
+                    joint[3] += 0.1
                 elif c == '9':
                     gripper -= 0.1
                 elif c == '0':
@@ -148,15 +131,24 @@ def main():
                 elif c == 'd':
                     z += 0.01
                 elif c == 'c':
-                    z -= 0.01
+                    if z <= 0.76:
+                        print("地面にめり込む")
+                    else:
+                        z -= 0.01
                 elif c == 'l':
                     x += 0.05
                 elif c == 'p':
-                    z -= 0.05
+                    if z <= 0.76:
+                        print("地面にめり込む")
+                    else:
+                        z -= 0.05
                 elif c == 'f':
                     pitch += 0.1
                 elif c == 'v':
-                    pitch -= 0.1
+                    if z <= 0.76:
+                        print("地面にめり込む")
+                    else:
+                        pitch -= 0.1
                 elif c == 'g':
                     ratio += 0.1
                 elif c == 'b':
@@ -178,8 +170,10 @@ def main():
                 if joint is None:
                     print('逆運動学の解なし')
                     joint = joint_prev.copy()
+                
                 elif c in 'gb':
                     gripper = from_gripper_ratio(ratio)
+                    
 
                 # 指令値を範囲内に収める
                 if not all(joint_in_range(joint)):

@@ -131,24 +131,11 @@ def main():
                 elif c == 'd':
                     z += 0.01
                 elif c == 'c':
-                    if z <= 0.76:
-                        print("地面にめり込む")
-                    else:
-                        z -= 0.01
-                elif c == 'l':
-                    x += 0.05
-                elif c == 'p':
-                    if z <= 0.76:
-                        print("地面にめり込む")
-                    else:
-                        z -= 0.05
+                    z -= 0.01
                 elif c == 'f':
                     pitch += 0.1
                 elif c == 'v':
-                    if z <= 0.76:
-                        print("地面にめり込む")
-                    else:
-                        pitch -= 0.1
+                    pitch -= 0.1
                 elif c == 'g':
                     ratio += 0.1
                 elif c == 'b':
@@ -165,15 +152,13 @@ def main():
                     break
 
                 # 逆運動学
-                if c in 'azsxdcfvlpe':
+                if c in 'azsxdcfve':
                     joint = inverse_kinematics([x, y, z, pitch], elbow_up)
-                if joint is None:
-                    print('逆運動学の解なし')
-                    joint = joint_prev.copy()
-                
+                    if joint is None:
+                        print('逆運動学の解なし')
+                        joint = joint_prev.copy()
                 elif c in 'gb':
                     gripper = from_gripper_ratio(ratio)
-                    
 
                 # 指令値を範囲内に収める
                 if not all(joint_in_range(joint)):
@@ -184,14 +169,11 @@ def main():
                     print('グリッパ指令値が範囲外')
                     gripper = gripper_prev
 
-                 
-
                 # 変化があればパブリッシュ
                 publish = False
                 if joint != joint_prev:
                     print((f'joint: [{joint[0]:.2f}, {joint[1]:.2f}, '
                            f'{joint[2]:.2f}, {joint[3]:.2f}]'))
-                    print(str([x, y, z, pitch]))
                     commander.publish_joint(joint, dt)
                     publish = True
                 if gripper != gripper_prev:

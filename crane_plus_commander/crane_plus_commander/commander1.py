@@ -83,7 +83,7 @@ def main():
             gripper_prev = gripper
 
             # 目標関節値とともに送る目標時間
-            dt = 0.3
+            dt = 0.2
 
             # キーが押されているか？
             if kb.kbhit():

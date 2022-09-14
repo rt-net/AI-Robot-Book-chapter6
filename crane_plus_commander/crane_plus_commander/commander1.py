@@ -132,7 +132,7 @@ def main():
     goals['carry'] = [-0.00, -1.37, -2.52, 1.17]
     goals['1/2'] = [0.5, 0.5, 0.5, 0.5]
     goals['move_ob'] = [0.0, -0.90, 0.10, 0.50]
-    #joint: [0.00, -0.60, 0.10, 0.40]
+    
     # Ctrl+cでエラーにならないようにKeyboardInterruptを捕まえる
     try:
         while True:
@@ -193,6 +193,7 @@ def main():
                             j, g = commander.get_joint_gripper()
                             print(f'[{j[0]:.2f}, {j[1]:.2f}, {j[2]:.2f}, {j[3]:.2f}] {g:.2f}')
                             print('')
+                            
                     except KeyboardInterrupt:
                         print(" ")
                         pass

@@ -115,13 +115,24 @@ def main():
                     else:
                         joint[1] += 0.1
                 elif c == '5':
-                    joint[2] -= 0.1
+                    if joint[2] == -0.10 and joint[1] == 1.40:
+                        print("地面にめり込む")
+                    else:
+                        joint[2] -= 0.1
                 elif c == '6':
-                    joint[2] += 0.1
+                    if joint[2] == 0.10 and joint[1] == -1.40:
+                        print("地面にめり込む")
+                    else:
+                        joint[2] += 0.1
                 elif c == '7':
                     joint[3] -= 0.1
                 elif c == '8':
-                    joint[3] += 0.1
+                    if joint[3] == 0.30 and joint[1] == -1.40:
+                        print("地面にめり込む")
+                    elif joint[2] >= -0.70 and joint[3] >= 1.50 and joint[1] == -1.40:
+                        print("地面にめり込む")
+                    else:
+                        joint[3] += 0.1
                 elif c == '9':
                     gripper -= 0.1
                 elif c == '0':
@@ -186,6 +197,7 @@ def main():
                 if joint != joint_prev:
                     print((f'joint: [{joint[0]:.2f}, {joint[1]:.2f}, '
                            f'{joint[2]:.2f}, {joint[3]:.2f}]'))
+                    print(str([x, y, z, pitch]))
                     commander.publish_joint(joint, dt)
                     publish = True
                 if gripper != gripper_prev:

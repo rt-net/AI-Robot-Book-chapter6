@@ -7,5 +7,5 @@ challenge6-2.pyはチャレンジ問題6.2のプログラムをcommander2.pyに�
 ## challenge6-5.py
 challenge6-5.pyチャレンジ問題6.5のプログラムをcommander5.pyに追加したものです。
 ## challenge6-6_miniproject6-2.py
-challenge6-6_miniproject6-2.pyチャレンジ問題6.6のプログラムとミニプロジェクト6.2をcommander6.pyに追加したものです。
+challenge6-6_miniproject6-2.pyチャレンジ問題6.6とミニプロジェクト6.2のプログラムをcommander6.pyに追加したものです。
 

@@ -31,6 +31,7 @@ setup(
             'commander5 = crane_plus_commander.commander5:main',
             'commander6 = crane_plus_commander.commander6:main',
             'test_client = crane_plus_commander.test_client:main',
+            'challenge6_1 = crane_plus_commander.challenge.challenge6_134:main',
          ],
     },
 )

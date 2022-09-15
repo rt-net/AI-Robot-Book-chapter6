@@ -1,13 +1,13 @@
 import os
 from glob import glob
-from setuptools import setup
+from setuptools import setup,find_packages
 
 package_name = 'crane_plus_commander'
 
 setup(
     name=package_name,
     version='1.0.0',
-    packages=[package_name],
+    packages=find_packages(),
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -31,7 +31,10 @@ setup(
             'commander5 = crane_plus_commander.commander5:main',
             'commander6 = crane_plus_commander.commander6:main',
             'test_client = crane_plus_commander.test_client:main',
-            'challenge6_1 = crane_plus_commander.challenge.challenge6_134:main',
+            'challenge6_134 = crane_plus_commander.challenge.challenge6_134:main',
+            'challenge6_2 = crane_plus_commander.challenge.challenge6_2:main',
+            'challenge6_5 = crane_plus_commander.challenge.challenge6_5:main',
+            'challenge6_6_minipro6_2 = crane_plus_commander.challenge.challenge6_6_minipro6_2:main',
          ],
     },
 )

@@ -131,21 +131,24 @@ def main():
                 elif c == 'd':
                     z += 0.01
                 elif c == 'c':
-                    if z <= 0.76:
+                    if z <= 0.076:
+                        #zの高さ設定できる(チャレンジ6.2)
                         print("地面にめり込む")
                     else:
                         z -= 0.01
                 elif c == 'l':
                     x += 0.05
                 elif c == 'p':
-                    if z <= 0.76:
+                    if z <= 0.076:
+                        #zの高さ設定できる(チャレンジ6.2)
                         print("地面にめり込む")
                     else:
                         z -= 0.05
                 elif c == 'f':
                     pitch += 0.1
                 elif c == 'v':
-                    if z <= 0.76:
+                    #zの高さ設定できる(チャレンジ6.2)
+                    if z <= 0.076:
                         print("地面にめり込む")
                     else:
                         pitch -= 0.1

@@ -99,10 +99,8 @@ class Commander(Node):
         if self.check_action_result(r, response):
             return
         time.sleep(2)
-        response.answer = '3sec stop' 
         
         #next arm => move
-        
           #逆運動学入れる
         words[0]={}
         words[0][str(words[1])] = [x,y,z,pitch]
@@ -116,11 +114,8 @@ class Commander(Node):
         r = self.send_goal_joint(self.joint, 3)
         if self.check_action_result(r, response):
             return        
-        response.answer = '3sec stop'     
-         
          
         #next gripper => close
-        
         gripper = 0
         dt = 1.0
         r = self.send_goal_gripper(gripper, dt)
@@ -140,7 +135,6 @@ class Commander(Node):
         if self.check_action_result(r, response):
             return
         time.sleep(2)
-        response.answer='3sec stop'
         
         #next arm => move
         words[0][str(words[1])][0]=words[0][str(words[1])][0] - 0.1

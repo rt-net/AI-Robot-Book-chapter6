@@ -25,4 +25,5 @@ $ ros2 run crane_plus_commander challenge6_2
 $ ros2 run crane_plus_commander challenge6_5
 
 #challenge6.6 miniproject6.2
-$ ros2 run crane_plus_commander challenge6_6_minipro6_2```
+$ ros2 run crane_plus_commander challenge6_6_minipro6_2
+```

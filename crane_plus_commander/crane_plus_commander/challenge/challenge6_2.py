@@ -177,7 +177,6 @@ def main():
                 elif c in 'gb':
                     gripper = from_gripper_ratio(ratio)
                     
-
                 # 指令値を範囲内に収める
                 if not all(joint_in_range(joint)):
                     print('関節指令値が範囲外')
@@ -186,8 +185,6 @@ def main():
                 if not gripper_in_range(gripper):
                     print('グリッパ指令値が範囲外')
                     gripper = gripper_prev
-
-                 
 
                 # 変化があればパブリッシュ
                 publish = False

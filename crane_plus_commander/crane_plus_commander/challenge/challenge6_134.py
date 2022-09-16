@@ -94,6 +94,7 @@ class Commander(Node):
         self.action_client_joint.wait_for_server()
         return self.action_client_joint.send_goal(goal_msg)
 
+
 def main():
     # ROSクライアントの初期化
     rclpy.init()
@@ -192,8 +193,7 @@ def main():
                             print(f'r.result.error_code: {r.result.error_code}')
                             j, g = commander.get_joint_gripper()
                             print(f'[{j[0]:.2f}, {j[1]:.2f}, {j[2]:.2f}, {j[3]:.2f}] {g:.2f}')
-                            print('')
-                            
+                            print('')    
                     except KeyboardInterrupt:
                         print(" ")
                         pass

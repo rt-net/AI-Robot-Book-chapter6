@@ -60,10 +60,6 @@ class Commander(Node):
             StringCommand, 'manipulation/command', self.command_callback,
             callback_group=self.callback_group)
         
-        
-        
-        #self.endtip = {}
-
     def command_callback(self, request, response):
         self.get_logger().info(f'command: {request.command}')
         words = request.command.split()
@@ -78,8 +74,7 @@ class Commander(Node):
         else:
             response.answer = f'NG {words[0]} not supported'
         self.get_logger().info(f'answer: {response.answer}')
-        return response
-        
+        return response        
         
     def set_pickup(self, words, response):
         if len(words) < 2:
@@ -151,8 +146,6 @@ class Commander(Node):
         time.sleep(2)
         response.answer = 'OK'
         
-        
-        
     def set_pose(self, words, response):
         if len(words) < 2:
             response.answer = f'NG {words[0]} argument required'
@@ -165,7 +158,6 @@ class Commander(Node):
             return
         response.answer = 'OK'
         
-        
     def set_endtip(self, words, response):
         if len(words) < 2:
             response.answer = f'NG {words[0]} argument required'
@@ -176,6 +168,7 @@ class Commander(Node):
             print((f'x: {x:.3f}, y: {y:.3f}, z: {z:.3f}, '
                    f'roll: {roll:.3f}, pitch: {pitch:.3f}, '
                    f'yaw: {yaw:.3f}'))
+                   
         #next arm => move       	
           #逆運動学入れる
         self.joint = inverse_kinematics([x, y, z, pitch], self.elbow_up)
@@ -188,7 +181,6 @@ class Commander(Node):
         if self.check_action_result(r, response):
             return
         response.answer = 'OK'
-
 
     def set_gripper(self, words, response):
         if len(words) < 2:
@@ -251,7 +243,6 @@ class Commander(Node):
         send_goal_future.add_done_callback(self.goal_response_callback)
         self.action_result = None
         self.action_done_event.wait(time*2)
-        
         return self.action_result
 
     def goal_response_callback(self, future):
@@ -301,9 +292,7 @@ class Commander(Node):
         roll, pitch, yaw = euler_from_quaternion([rx, ry, rz, rw])
         return tx, ty, tz, roll, pitch, yaw
      
-    
-    
-    
+            
 def main():
     print('開始')
 
@@ -321,9 +310,7 @@ def main():
     # Ctrl+cでエラーにならないようにKeyboardInterruptを捕まえる
     try:
         executor = MultiThreadedExecutor()
-        rclpy.spin(commander, executor)
-        
-        
+        rclpy.spin(commander, executor)        
     except KeyboardInterrupt:
         pass
 

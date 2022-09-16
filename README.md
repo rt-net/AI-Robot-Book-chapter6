@@ -1,3 +1,14 @@
+このリポジトリは
+[AI-Robot-Book/chapter6](https://github.com/AI-Robot-Book/chapter6)をforkしたものです。
+
+書籍の[第6章のチャレンジ課題用プログラム](./crane_plus_commander/crane_plus_commander/challenge)を追加しています。
+
+詳細はアールティのヒューマノイドブログを参照してください。
+
+- [CRANE+ V2セットアップ編　インターンシップ Part1　](https://rt-net.jp/humanoid/archives/4611)
+- [CRANE+ V2運動学編　インターンシップ Part2](https://rt-net.jp/humanoid/archives/4711)
+- [「ROS 2とPythonで作って学ぶAIロボット入門」やってみた　インターンシップ 最終回](https://rt-net.jp/humanoid/archives/4780)
+
 # 第6章 マニピュレーション
 
 ## 概要

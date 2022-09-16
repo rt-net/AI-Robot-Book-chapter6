@@ -143,7 +143,7 @@ def main():
                         #zの高さ設定できる(チャレンジ6.2)
                         print("地面にめり込む")
                     else:
-                        z -= 0.05
+                        x -= 0.05
                 elif c == 'f':
                     pitch += 0.1
                 elif c == 'v':

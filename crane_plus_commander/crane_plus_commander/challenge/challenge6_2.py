@@ -136,9 +136,9 @@ def main():
                         print("地面にめり込む")
                     else:
                         z -= 0.01
-                elif c == 'l':
+                elif c == 'A':
                     x += 0.05
-                elif c == 'p':
+                elif c == 'Z':
                     if z <= 0.076:
                         #zの高さ設定できる(チャレンジ6.2)
                         print("地面にめり込む")
@@ -168,7 +168,7 @@ def main():
                     break
 
                 # 逆運動学
-                if c in 'azsxdcfvlpe':
+                if c in 'azsxdcfvAZe':
                     joint = inverse_kinematics([x, y, z, pitch], elbow_up)
                 if joint is None:
                     print('逆運動学の解なし')
